@@ -26,7 +26,6 @@ func _ready():
 func _unhandled_key_input(_event):
 	# Spin
 	if Input.is_action_just_pressed("ui_page_up") and !_inSpin and spin_space_detect():
-		find_ground()
 		collision.disabled = true
 		towards += 1
 		var tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
@@ -35,7 +34,6 @@ func _unhandled_key_input(_event):
 		tween.tween_property(self, "_inSpin", false, 0)
 		tween.tween_callback(spin)
 	if Input.is_action_just_pressed("ui_page_down") and !_inSpin and spin_space_detect():
-		find_ground()
 		collision.disabled = true
 		towards -= 1
 		var tween = create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUART)
@@ -88,7 +86,9 @@ func _physics_process(delta):
 		rotate_direct = 0
 		visual.rotation.z = lerp(visual.rotation.z,get_floor_actual_angle() + (floor( ((visual.rotation.z+(PI/4)) * 2) / PI ) * (PI/2)),0.5)
 
-	if !_inSpin : move_and_slide()
+	if !_inSpin :
+		move_and_slide()
+		find_ground()
 
 func spin():
 	match towards:
@@ -121,7 +121,7 @@ func spin_space_detect():
 	else : return false
 	
 func find_ground():
-	if ground_detect.get_collision_count() == 0 and is_on_floor():
+	if ground_detect.get_collision_count() == 0 and is_on_floor() and ground_finder.is_colliding():
 		if towards == 0 or towards == 2 :
 			self.position.z = ground_finder.get_collision_point(0).z
 		else :

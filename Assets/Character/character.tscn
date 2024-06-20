@@ -22,10 +22,10 @@ albedo_texture = SubResource("GradientTexture2D_c20nh")
 size = Vector3(100, 1, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_k8fao"]
-size = Vector3(1, 0.1, 1)
+size = Vector3(1, 0.01, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xfhmt"]
-size = Vector3(1, 0, 100)
+size = Vector3(1, 0.01, 100)
 
 [node name="Character" type="CharacterBody3D"]
 collision_layer = 4
@@ -53,10 +53,10 @@ collision_mask = 3
 
 [node name="GroundDetect" type="ShapeCast3D" parent="CollisionShape"]
 shape = SubResource("BoxShape3D_k8fao")
-target_position = Vector3(0, -0.55, 0)
+target_position = Vector3(0, -0.505, 0)
 collision_mask = 3
 
 [node name="GroundFinder" type="ShapeCast3D" parent="CollisionShape"]
 shape = SubResource("BoxShape3D_xfhmt")
-target_position = Vector3(0, -0.501, 0)
+target_position = Vector3(0, -0.505, 0)
 collision_mask = 3
