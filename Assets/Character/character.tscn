@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://u1k3pggod73i"]
+[gd_scene load_steps=11 format=3 uid="uid://u1k3pggod73i"]
 
 [ext_resource type="Script" path="res://Assets/Character/character.gd" id="1_iije8"]
 
@@ -26,6 +26,9 @@ size = Vector3(1, 0.01, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xfhmt"]
 size = Vector3(1, 0.01, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_g1pit"]
+size = Vector3(1, 0.1, 100)
 
 [node name="Character" type="CharacterBody3D"]
 collision_layer = 4
@@ -57,6 +60,23 @@ target_position = Vector3(0, -0.505, 0)
 collision_mask = 3
 
 [node name="GroundFinder" type="ShapeCast3D" parent="CollisionShape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
 shape = SubResource("BoxShape3D_xfhmt")
-target_position = Vector3(0, -0.505, 0)
-collision_mask = 3
+target_position = Vector3(0, 0, 0)
+collision_mask = 11
+
+[node name="PlatFinder" type="ShapeCast3D" parent="CollisionShape"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.55, 0)
+visible = false
+enabled = false
+shape = SubResource("BoxShape3D_g1pit")
+target_position = Vector3(0, 0, 0)
+collision_mask = 8
+
+[node name="PlatformDetect" type="StaticBody3D" parent="CollisionShape"]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape" type="CollisionShape3D" parent="CollisionShape/PlatformDetect"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
+shape = SubResource("BoxShape3D_xfhmt")

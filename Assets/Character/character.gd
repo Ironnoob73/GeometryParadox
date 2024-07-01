@@ -1,11 +1,15 @@
 extends CharacterBody3D
 
+const VERY_SMALL_NUMBER = 0.0001
+
 @onready var collision = $CollisionShape
 @onready var visual = $CollisionShape/Visual
 @onready var cam = $CollisionShape/Camera
 @onready var space_detect = $CollisionShape/SpaceDetect
 @onready var ground_detect = $CollisionShape/GroundDetect
 @onready var ground_finder = $CollisionShape/GroundFinder
+@onready var platform_finder = $CollisionShape/PlatFinder
+@onready var platform_detect = $CollisionShape/PlatformDetect
 
 @export var Speed = 10
 @export var JumpVelocity = 20
@@ -43,15 +47,19 @@ func _unhandled_key_input(_event):
 		tween.tween_callback(spin)
 		
 func _physics_process(delta):
+	if !_inSpin :
+		find_ground(delta)
+		
+	if velocity.x > -VERY_SMALL_NUMBER and velocity.x < VERY_SMALL_NUMBER:
+		velocity.x = 0
+	if velocity.z > -VERY_SMALL_NUMBER and velocity.z < VERY_SMALL_NUMBER:
+		velocity.z = 0
 	# Record Inerita & Add the gravity.
-	if is_on_floor():
+	if is_on_platform(delta):
 		_inertia.x = velocity.x
 		_inertia.y = velocity.z
+		velocity.y = 0
 	else:	velocity.y -= gravity * delta * GravityMulti
-
-	# Handle jump.
-	if (Input.is_action_just_pressed("ui_accept") or Input.is_action_just_pressed("ui_up")) and is_on_floor():
-		velocity.y = JumpVelocity
 	
 	# Move & Stop
 	var input_vec : float = 0
@@ -66,29 +74,37 @@ func _physics_process(delta):
 		velocity.z = lerp(velocity.z,input_vec * Speed , 0.1)
 		
 	if velocity.x * input_vec <= 0 and velocity.x!=0:
-		if is_on_floor() :	velocity.x = lerp(velocity.x,0.0,0.5)
-		else:				velocity.x = lerp(_inertia.x,0.0,0.5)
+		velocity.x = lerp(velocity.x,0.0,0.5)
+		#else:				velocity.x = lerp(_inertia.x,0.0,0.5)
 	if velocity.z * input_vec <= 0 and velocity.z!=0:
-		if is_on_floor() :	velocity.z = lerp(velocity.z,0.0,0.5)
-		else:				velocity.z = lerp(_inertia.y,0.0,0.5)
+		velocity.z = lerp(velocity.z,0.0,0.5)
+		#else:				velocity.z = lerp(_inertia.y,0.0,0.5)
 		
 	# Rotate
-	if !is_on_floor() and !_inSpin:
-		if !rotate_direct:
-			if towards == 0 or towards == 1:
-				if velocity.x > 0 or velocity.z < 0:	rotate_direct = -1
-				if velocity.x < 0 or velocity.z > 0:	rotate_direct = 1
+	#print(velocity," ",rotate_direct)
+	if !is_on_platform(delta) and !_inSpin:
+		if velocity.x != 0 or velocity.z != 0 :
+			if rotate_direct == 0 :
+				if towards == 0 or towards == 1:
+					if velocity.x > 0 or velocity.z < 0:	rotate_direct = -1
+					if velocity.x < 0 or velocity.z > 0:	rotate_direct = 1
+				else:
+					if velocity.x > 0 or velocity.z < 0:	rotate_direct = 1
+					if velocity.x < 0 or velocity.z > 0:	rotate_direct = -1
 			else:
-				if velocity.x > 0 or velocity.z < 0:	rotate_direct = 1
-				if velocity.x < 0 or velocity.z > 0:	rotate_direct = -1
-		visual.rotation.z += delta * RotateSpeed * rotate_direct
-	else:
+				visual.rotation.z += delta * RotateSpeed * rotate_direct
+		else :
+			visual.rotation.z = lerp(visual.rotation.z,floor( ((visual.rotation.z+(PI/4)) * 2) / PI ) * (PI/2),0.5)
+	elif is_on_platform(delta):
 		rotate_direct = 0
 		visual.rotation.z = lerp(visual.rotation.z,get_floor_actual_angle() + (floor( ((visual.rotation.z+(PI/4)) * 2) / PI ) * (PI/2)),0.5)
 
+	# Handle jump.
+	if (Input.is_action_pressed("ui_accept") or Input.is_action_pressed("ui_up")) and is_on_platform(delta):
+		velocity.y = JumpVelocity
+		
 	if !_inSpin :
 		move_and_slide()
-		find_ground()
 
 func spin():
 	match towards:
@@ -97,6 +113,14 @@ func spin():
 		4 :
 			towards = 0
 	collision.disabled = false
+
+func is_on_platform(delta):
+	#print(is_on_floor()," ",velocity.y <= 0," ",ground_finder.is_colliding()," ",platform_finder.is_colliding())
+	if is_on_floor() or (velocity.y <= 0 and (ground_finder.is_colliding() )) :
+		#if !ground_finder.is_colliding():
+		#	velocity.y -= gravity * delta * GravityMulti * 0.5
+		return true
+	else : return false
 
 func get_floor_actual_angle():
 	if get_floor_angle() != 0 and get_floor_normal() != Vector3(0,1,0) :
@@ -117,12 +141,17 @@ func get_floor_actual_angle():
 	return 0
 
 func spin_space_detect():
+	space_detect.force_shapecast_update()
 	if space_detect.get_collision_count() == 0 : return true
 	else : return false
 	
-func find_ground():
-	if ground_detect.get_collision_count() == 0 and is_on_floor() and ground_finder.is_colliding():
+func find_ground(delta):
+	if !ground_detect.is_colliding() and is_on_platform(delta) and ground_finder.is_colliding():
 		if towards == 0 or towards == 2 :
 			self.position.z = ground_finder.get_collision_point(0).z
 		else :
 			self.position.x = ground_finder.get_collision_point(0).x
+
+#func _on_platform_detect_body_entered(body):
+#	print("do")
+#	velocity.y = 0
