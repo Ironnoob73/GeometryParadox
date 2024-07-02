@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bkebuwqknne6x"]
+
+[ext_resource type="Shader" path="res://Resources/Materials/Sources/Shaders/background.gdshader" id="1_fleqb"]
+[ext_resource type="Texture2D" uid="uid://dfhkb4figbqp3" path="res://Resources/Materials/Sources/BlueGrid.tres" id="2_vml0w"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_fleqb")
+shader_parameter/lock_aspect = false
+shader_parameter/aspect_ratio = 1.33333
+shader_parameter/fov = Vector2(180, 45)
+shader_parameter/tiling = Vector2i(10, 10)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/texture = ExtResource("2_vml0w")

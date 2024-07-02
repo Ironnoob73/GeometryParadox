@@ -1,0 +1,82 @@
+[gd_scene load_steps=16 format=3 uid="uid://1d66qbkqrd3y"]
+
+[ext_resource type="PackedScene" uid="uid://u1k3pggod73i" path="res://Assets/Character/character.tscn" id="1_oplyt"]
+[ext_resource type="Shader" path="res://Resources/Materials/Sources/Shaders/background.gdshader" id="2_468fh"]
+[ext_resource type="Texture2D" uid="uid://wk85kt76y5ou" path="res://Resources/Materials/Sources/Ground_Normal.png" id="3_8pcw8"]
+[ext_resource type="Script" path="res://Assets/World/test/test_Ground.gd" id="4_x441o"]
+[ext_resource type="Shader" path="res://Resources/Materials/Sources/Shaders/Highlight.gdshader" id="5_c34nf"]
+[ext_resource type="Texture2D" uid="uid://c740q0wexq8qf" path="res://Resources/Materials/Sources/Background_Normal.png" id="6_5u4mu"]
+[ext_resource type="Script" path="res://Assets/World/test/test_Background.gd" id="7_s3usr"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nc8jr"]
+
+[sub_resource type="Sky" id="Sky_x5mny"]
+sky_material = SubResource("ProceduralSkyMaterial_nc8jr")
+
+[sub_resource type="Environment" id="Environment_j0wb5"]
+background_energy_multiplier = 0.0
+sky = SubResource("Sky_x5mny")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rvtvl"]
+render_priority = 0
+shader = ExtResource("2_468fh")
+shader_parameter/lock_aspect = false
+shader_parameter/aspect_ratio = 1.33333
+shader_parameter/fov = Vector2(180, 45)
+shader_parameter/tiling = Vector2i(10, 10)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/texture = ExtResource("3_8pcw8")
+
+[sub_resource type="Gradient" id="Gradient_8o5qg"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2lad5"]
+gradient = SubResource("Gradient_8o5qg")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_05jad"]
+render_priority = 0
+shader = ExtResource("5_c34nf")
+shader_parameter/texture = SubResource("GradientTexture1D_2lad5")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_10gvk"]
+render_priority = 0
+shader = ExtResource("2_468fh")
+shader_parameter/lock_aspect = false
+shader_parameter/aspect_ratio = 1.33333
+shader_parameter/fov = Vector2(180, 45)
+shader_parameter/tiling = Vector2i(2, 2)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/texture = ExtResource("6_5u4mu")
+
+[node name="MainWorld" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_j0wb5")
+
+[node name="Character" parent="." instance=ExtResource("1_oplyt")]
+RotateSpeed = 8
+
+[node name="S" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2, 0)
+use_collision = true
+size = Vector3(100, 3, 100)
+material = SubResource("ShaderMaterial_rvtvl")
+script = ExtResource("4_x441o")
+
+[node name="GroundHighlight" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.55, 0)
+size = Vector3(101, 0.1, 101)
+material = SubResource("ShaderMaterial_05jad")
+
+[node name="Background" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 49, 0)
+flip_faces = true
+size = Vector3(99, 100, 99)
+material = SubResource("ShaderMaterial_10gvk")
+script = ExtResource("7_s3usr")

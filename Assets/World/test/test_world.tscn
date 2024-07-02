@@ -1,0 +1,124 @@
+[gd_scene load_steps=16 format=3 uid="uid://bvlqnsj7e2g0k"]
+
+[ext_resource type="PackedScene" uid="uid://u1k3pggod73i" path="res://Assets/Character/character.tscn" id="1_lpbls"]
+[ext_resource type="PackedScene" uid="uid://bbce5vm67hq0g" path="res://Resources/Buildings/Platforms/Normal/Scene.tscn" id="2_d7o85"]
+[ext_resource type="Material" uid="uid://bkebuwqknne6x" path="res://Resources/Materials/Ground.tres" id="2_pkofm"]
+[ext_resource type="Script" path="res://Assets/World/test/test_Ground.gd" id="3_emcjl"]
+[ext_resource type="Shader" path="res://Resources/Materials/Sources/Shaders/Highlight.gdshader" id="4_i6dyy"]
+[ext_resource type="Shader" path="res://Resources/Materials/Sources/Shaders/background.gdshader" id="4_j7dbu"]
+[ext_resource type="Texture2D" uid="uid://dfhkb4figbqp3" path="res://Resources/Materials/Sources/BlueGrid.tres" id="5_d4q2x"]
+[ext_resource type="Script" path="res://Assets/World/test/test_Background.gd" id="6_77jrp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nc8jr"]
+
+[sub_resource type="Sky" id="Sky_x5mny"]
+sky_material = SubResource("ProceduralSkyMaterial_nc8jr")
+
+[sub_resource type="Environment" id="Environment_j0wb5"]
+background_energy_multiplier = 0.0
+sky = SubResource("Sky_x5mny")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 2.0
+
+[sub_resource type="Gradient" id="Gradient_8o5qg"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2lad5"]
+gradient = SubResource("Gradient_8o5qg")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_05jad"]
+render_priority = 0
+shader = ExtResource("4_i6dyy")
+shader_parameter/texture = SubResource("GradientTexture1D_2lad5")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5o6sj"]
+render_priority = 0
+shader = ExtResource("4_j7dbu")
+shader_parameter/lock_aspect = false
+shader_parameter/aspect_ratio = 1.33333
+shader_parameter/fov = Vector2(180, 45)
+shader_parameter/tiling = Vector2i(50, 50)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/texture = ExtResource("5_d4q2x")
+
+[node name="MainWorld" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_j0wb5")
+
+[node name="Character" parent="." instance=ExtResource("1_lpbls")]
+RotateSpeed = 8
+
+[node name="S" type="Node3D" parent="."]
+
+[node name="Ground" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+use_collision = true
+size = Vector3(100, 1, 100)
+material = ExtResource("2_pkofm")
+script = ExtResource("3_emcjl")
+
+[node name="GroundHighlight" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.55, 0)
+size = Vector3(101, 0.1, 101)
+material = SubResource("ShaderMaterial_05jad")
+
+[node name="Background" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 49, 0)
+flip_faces = true
+size = Vector3(100, 100, 100)
+material = SubResource("ShaderMaterial_5o6sj")
+script = ExtResource("6_77jrp")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+use_collision = true
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0)
+use_collision = true
+size = Vector3(1, 2, 1)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="S"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 1)
+use_collision = true
+size = Vector3(1, 3, 1)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="S"]
+transform = Transform3D(0.92388, -0.382683, 0, 0.382683, 0.92388, 0, 0, 0, 1, 15, 0.75, 5)
+use_collision = true
+size = Vector3(10, 1, 1)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="S"]
+transform = Transform3D(-4.03841e-08, 1.67276e-08, 1, 0.382683, 0.92388, 0, -0.923879, 0.382683, -4.37114e-08, -1, 0.75, -8)
+use_collision = true
+size = Vector3(10, 1, 1)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="S"]
+transform = Transform3D(0.65368, 0.270763, -0.706675, -0.382683, 0.92388, 0, 0.652882, 0.270433, 0.707539, -10, 0.75, 0)
+use_collision = true
+size = Vector3(10, 1, 1)
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="S"]
+transform = Transform3D(0.92388, 0.382683, 0, -0.382683, 0.92388, 0, 0, 0, 1, 25, 0.75, 7)
+use_collision = true
+size = Vector3(10, 1, 1)
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="S"]
+transform = Transform3D(0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0, 1, 35, 2, -10)
+use_collision = true
+size = Vector3(10, 1, 1)
+
+[node name="Platform" parent="S" instance=ExtResource("2_d7o85")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, 0)
+
+[node name="Platform2" parent="S" instance=ExtResource("2_d7o85")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 3, -3)
+
+[node name="Platform3" parent="S" instance=ExtResource("2_d7o85")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.5, 3)
+
+[node name="Platform4" parent="S" instance=ExtResource("2_d7o85")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1, 6)

@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Assets/Character/character.gd" id="1_iije8"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_q3oat"]
-size = Vector3(1, 1, 100)
+size = Vector3(0.99, 1, 512)
 
 [sub_resource type="Gradient" id="Gradient_pftvc"]
 interpolation_mode = 2
@@ -19,20 +19,20 @@ albedo_texture = SubResource("GradientTexture2D_c20nh")
 [sub_resource type="QuadMesh" id="QuadMesh_1s7er"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p45d5"]
-size = Vector3(100, 1, 1)
+size = Vector3(512, 1, 0.99)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_k8fao"]
-size = Vector3(1, 0.01, 1)
+size = Vector3(0.99, 0.01, 0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xfhmt"]
-size = Vector3(1, 0.01, 100)
+size = Vector3(0.99, 0.01, 512)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_g1pit"]
-size = Vector3(1, 0.1, 100)
+[sub_resource type="BoxShape3D" id="BoxShape3D_krxhm"]
+size = Vector3(0.99, 0.5, 512)
 
 [node name="Character" type="CharacterBody3D"]
 collision_layer = 4
-collision_mask = 3
+collision_mask = 11
 script = ExtResource("1_iije8")
 RotateSpeed = 7
 
@@ -57,7 +57,7 @@ collision_mask = 3
 [node name="GroundDetect" type="ShapeCast3D" parent="CollisionShape"]
 shape = SubResource("BoxShape3D_k8fao")
 target_position = Vector3(0, -0.505, 0)
-collision_mask = 3
+collision_mask = 11
 
 [node name="GroundFinder" type="ShapeCast3D" parent="CollisionShape"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
@@ -65,18 +65,13 @@ shape = SubResource("BoxShape3D_xfhmt")
 target_position = Vector3(0, 0, 0)
 collision_mask = 11
 
-[node name="PlatFinder" type="ShapeCast3D" parent="CollisionShape"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.55, 0)
-visible = false
-enabled = false
-shape = SubResource("BoxShape3D_g1pit")
-target_position = Vector3(0, 0, 0)
-collision_mask = 8
-
-[node name="PlatformDetect" type="StaticBody3D" parent="CollisionShape"]
+[node name="PlatformDetect" type="Area3D" parent="CollisionShape"]
 collision_layer = 0
 collision_mask = 8
 
 [node name="CollisionShape" type="CollisionShape3D" parent="CollisionShape/PlatformDetect"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.505, 0)
-shape = SubResource("BoxShape3D_xfhmt")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.75, 0)
+shape = SubResource("BoxShape3D_krxhm")
+
+[connection signal="area_entered" from="CollisionShape/PlatformDetect" to="." method="_on_platform_detect_area_entered"]
+[connection signal="area_exited" from="CollisionShape/PlatformDetect" to="." method="_on_platform_detect_area_exited"]
